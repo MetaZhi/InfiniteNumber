@@ -122,33 +122,19 @@ namespace HongliuSchool
 
         public static bool operator >(InfiniteNumber lhs, InfiniteNumber rhs)
         {
-            return CompareDigit(lhs, rhs, 0);
-        }
+            var lHighestDigit = lhs._digits.Count;
+            var rHighestDigit = rhs._digits.Count;
 
-        private static bool CompareDigit(InfiniteNumber l, InfiniteNumber r, int i)
-        {
-            var lhs = l;
-            var rhs = r;
-            if (i > 0)
+            if (lHighestDigit == rHighestDigit)
             {
-                lhs = new InfiniteNumber(l, i);
-                rhs = new InfiniteNumber(r, i);
-            }
-
-            var lHighestDidig = lhs.FindHighestDigit();
-            var rHighestDidig = rhs.FindHighestDigit();
-
-            if (lHighestDidig == rHighestDidig)
-            {
-                if (lhs._digits[lHighestDidig] == rhs._digits[rHighestDidig])
+                for (int i = lHighestDigit - 1; i >= 0; i--)
                 {
-                    return CompareDigit(lhs, rhs, 1);
+                    if (lhs._digits[i] == rhs._digits[i]) continue;
+                    return lhs._digits[i] > rhs._digits[i];
                 }
-
-                return lhs._digits[lHighestDidig] > rhs._digits[rHighestDidig];
             }
 
-            return lHighestDidig > rHighestDidig;
+            return lHighestDigit > rHighestDigit;
         }
 
         public static bool operator <(InfiniteNumber lhs, InfiniteNumber rhs)
@@ -160,25 +146,16 @@ namespace HongliuSchool
         public static InfiniteNumber operator +(InfiniteNumber lhs, InfiniteNumber rhs)
         {
             var newNumber = new InfiniteNumber();
-            var lHighestDidig = lhs.FindHighestDigit();
-            var rHighestDidig = rhs.FindHighestDigit();
+            var lHighestDigit = lhs._digits.Count;
+            var rHighestDigit = rhs._digits.Count;
+            var maxDigitCount = Mathf.Max(lHighestDigit, rHighestDigit);
 
-            var maxDigitCount = Mathf.Max(lHighestDidig, rHighestDidig);
-
-            // 进位
             ushort increase = 0;
-            for (int i = 0; i <= maxDigitCount; i++)
+            for (int i = 0; i < maxDigitCount; i++)
             {
                 ushort d = 0;
-                if (lHighestDidig >= i)
-                {
-                    d += lhs._digits[i];
-                }
-
-                if (rHighestDidig >= i)
-                {
-                    d += rhs._digits[i];
-                }
+                if (lHighestDigit > i) d += lhs._digits[i];
+                if (rHighestDigit > i) d += rhs._digits[i];
 
                 d += increase;
                 increase = 0;
@@ -188,14 +165,12 @@ namespace HongliuSchool
                     increase = (ushort)(d / 1000);
                     d %= 1000;
                 }
-
+            
                 newNumber._digits.Add(d);
             }
 
             if (increase > 0)
-            {
                 newNumber._digits.Add(increase);
-            }
 
             return newNumber;
         }
